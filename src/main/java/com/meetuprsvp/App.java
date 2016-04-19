@@ -69,6 +69,6 @@ public class App {
         App app = new App();
         app.setPusher();
         app.getMeetupData();
-        get("/hello", (req, res) -> "hey there!");
+        get("/hello", (req, res) -> "Hey!!!");
     }
 }
