@@ -57,8 +57,8 @@
 
         <dependency>
             <groupId>com.pusher</groupId>
-            <artifactId>pusher-java-client</artifactId>
-            <version>1.1.2</version>
+            <artifactId>pusher-http-java</artifactId>
+            <version>0.9.3</version>
         </dependency>
 
         <dependency>

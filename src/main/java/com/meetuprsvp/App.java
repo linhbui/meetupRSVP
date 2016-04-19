@@ -4,12 +4,7 @@ import static spark.Spark.get;
 import static spark.SparkBase.staticFileLocation;
 
 import com.ning.http.client.*;
-import com.pusher.client.Pusher;
-import com.pusher.client.channel.Channel;
-import com.pusher.client.channel.SubscriptionEventListener;
-import com.pusher.client.connection.ConnectionEventListener;
-import com.pusher.client.connection.ConnectionState;
-import com.pusher.client.connection.ConnectionStateChange;
+import com.pusher.rest.Pusher;
 
 import java.nio.*;
 import java.nio.charset.*;
@@ -17,7 +12,9 @@ import java.io.StringReader;
 import javax.json.*;
 
 public class App {
-    public static JsonObject dataToJson(String lon, String lat) {
+    private Pusher pusher;
+
+    public JsonObject dataToJson(String lon, String lat) {
         JsonObject data = Json.createObjectBuilder()
                 .add("lon", lon)
                 .add("lat", lat)
@@ -25,7 +22,7 @@ public class App {
         return data;
     }
 
-    public static void getMeetupData () {
+    public void getMeetupData () {
         AsyncHttpClient c = new AsyncHttpClient();
 
         c.prepareGet("https://stream.meetup.com/2/rsvps").execute(new AsyncCompletionHandler<com.ning.http.client.Response>()
@@ -50,6 +47,8 @@ public class App {
                 }
 
                 JsonObject data = dataToJson(lon, lat);
+                pusher.trigger("client-data", "rsvp", data.toString());
+
                 return STATE.CONTINUE;
             }
 
@@ -60,35 +59,16 @@ public class App {
         });
     }
 
+    public void setPusher () {
+        pusher = new Pusher("198677", "d666fb92d6623055b4a1", "1b2b3696500628256283");
+        pusher.setEncrypted(true);
+    }
+
     public static void main( String[] args) {
         staticFileLocation("public");
-        // Create a new Pusher instance
-        Pusher pusher = new Pusher("d666fb92d6623055b4a1");
-
-        pusher.connect(new ConnectionEventListener() {
-            @Override
-            public void onConnectionStateChange(ConnectionStateChange change) {
-                System.out.println("State changed to " + change.getCurrentState() +
-                        " from " + change.getPreviousState());
-            }
-
-            @Override
-            public void onError(String message, String code, Exception e) {
-                System.out.println("There was a problem connecting!");
-            }
-        }, ConnectionState.ALL);
-
-        // Subscribe to a channel
-        Channel channel = pusher.subscribe("test_channel");
-
-        // Bind to listen for events called "my_event" sent to "my-channel"
-        channel.bind("my_event", new SubscriptionEventListener() {
-            @Override
-            public void onEvent(String channel, String event, String data) {
-                System.out.println("Received event with data: " + data);
-            }
-        });
-
+        App app = new App();
+        app.setPusher();
+        app.getMeetupData();
         get("/hello", (req, res) -> "hey there!");
     }
 }
