@@ -4,6 +4,12 @@ import static spark.Spark.get;
 import static spark.SparkBase.staticFileLocation;
 
 import com.ning.http.client.*;
+import com.pusher.client.Pusher;
+import com.pusher.client.channel.Channel;
+import com.pusher.client.channel.SubscriptionEventListener;
+import com.pusher.client.connection.ConnectionEventListener;
+import com.pusher.client.connection.ConnectionState;
+import com.pusher.client.connection.ConnectionStateChange;
 
 import java.nio.*;
 import java.nio.charset.*;
@@ -56,6 +62,33 @@ public class App {
 
     public static void main( String[] args) {
         staticFileLocation("public");
+        // Create a new Pusher instance
+        Pusher pusher = new Pusher("d666fb92d6623055b4a1");
+
+        pusher.connect(new ConnectionEventListener() {
+            @Override
+            public void onConnectionStateChange(ConnectionStateChange change) {
+                System.out.println("State changed to " + change.getCurrentState() +
+                        " from " + change.getPreviousState());
+            }
+
+            @Override
+            public void onError(String message, String code, Exception e) {
+                System.out.println("There was a problem connecting!");
+            }
+        }, ConnectionState.ALL);
+
+        // Subscribe to a channel
+        Channel channel = pusher.subscribe("test_channel");
+
+        // Bind to listen for events called "my_event" sent to "my-channel"
+        channel.bind("my_event", new SubscriptionEventListener() {
+            @Override
+            public void onEvent(String channel, String event, String data) {
+                System.out.println("Received event with data: " + data);
+            }
+        });
+
         get("/hello", (req, res) -> "hey there!");
     }
 }
