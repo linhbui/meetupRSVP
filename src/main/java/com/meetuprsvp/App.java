@@ -60,7 +60,7 @@ public class App {
     }
 
     public void setPusher () {
-        pusher = new Pusher("198677", "d666fb92d6623055b4a1", "1b2b3696500628256283");
+        pusher = new Pusher(Secret.APP_ID, Secret.KEY , Secret.SECRET);
         pusher.setEncrypted(true);
     }
 
