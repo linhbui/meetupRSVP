@@ -38,20 +38,22 @@ public class App {
                 try {
                     lon = object.getJsonObject("venue").get("lon").toString();
                 } catch (java.lang.NullPointerException e) {
-                    lon = "0";
+                    lon = "74.0059"; //NYC
                 }
 
                 try {
                     lat = object.getJsonObject("venue").get("lat").toString();
                 } catch (java.lang.NullPointerException e) {
-                    lat = "0";
+                    lat = "40.7128"; //NYC
                 }
 
                 try {
                     city = object.getJsonObject("group").get("group_city").toString();
                 } catch (java.lang.NullPointerException e) {
-                    city = "not found";
+                    city = "New York City";
                 }
+
+                System.out.println(city);
 
                 JsonObject data = dataToJson(lon, lat, city);
                 pusher.trigger("client-data", "rsvp", data.toString());

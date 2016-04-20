@@ -3,38 +3,33 @@ var ctx = canvasEl.getContext("2d");
 
 canvasEl.height = window.innerHeight;
 canvasEl.width = window.innerWidth;
+
 var background = new Image();
 background.src = "map_3mb.jpg";
-
-var redDot = new Image();
-redDot.src = "dot_red.gif";
 
 // Make sure the image is loaded first otherwise nothing will draw.
 background.onload = function(){
   ctx.drawImage(background,0,0,canvasEl.width, canvasEl.height);
 }
 
+var redDot = new Image();
+redDot.src = "dot_red.gif";
+
 var equator = canvasEl.height/2;
 var primeMeridian = canvasEl.width/2;
 
-function calculateX (lat) {
+function calculateY (lat) {
   floatLat = parseFloat(lat);
   // South of equator is considered negative -__-
-  x = equator - floatLat/90 * equator;
-  return x;
-}
-
-function calculateY (lon) {
-  floatLon = parseFloat(lon);
-  y = primeMeridian + floatLon/180 * primeMeridian;
+  y = equator - floatLat/90 * equator;
   return y;
 }
 
-Pusher.log = function(message) {
-  if (window.console && window.console.log) {
-    window.console.log(message);
-  }
-};
+function calculateX (lon) {
+  floatLon = parseFloat(lon);
+  x = primeMeridian + floatLon/180 * primeMeridian;
+  return x;
+}
 
 var pusher = new Pusher('d666fb92d6623055b4a1', {
   encrypted: true
@@ -44,8 +39,8 @@ var channel = pusher.subscribe('client-data');
 
 channel.bind('rsvp', function(data) {
   var obj = JSON.parse(data);
-  var x = calculateX(obj.lat);
-  var y = calculateY(obj.lon);
+  var x = calculateX(obj.lon);
+  var y = calculateY(obj.lat);
   ctx.drawImage(redDot, x, y);
   console.log(obj.city);
 });
