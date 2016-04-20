@@ -14,10 +14,11 @@ import javax.json.*;
 public class App {
     private Pusher pusher;
 
-    public JsonObject dataToJson(String lon, String lat) {
+    public JsonObject dataToJson(String lon, String lat, String city) {
         JsonObject data = Json.createObjectBuilder()
                 .add("lon", lon)
                 .add("lat", lat)
+                .add("city", city)
                 .build();
         return data;
     }
@@ -33,7 +34,7 @@ public class App {
                 CharBuffer contentCharBuffer = StandardCharsets.UTF_8.decode(contentByte);
                 String contentString = contentCharBuffer.toString();
                 JsonObject object = Json.createReader(new StringReader(contentString)).readObject();
-                String lon, lat;
+                String lon, lat, city;
                 try {
                     lon = object.getJsonObject("venue").get("lon").toString();
                 } catch (java.lang.NullPointerException e) {
@@ -46,7 +47,13 @@ public class App {
                     lat = "0";
                 }
 
-                JsonObject data = dataToJson(lon, lat);
+                try {
+                    city = object.getJsonObject("group").get("group_city").toString();
+                } catch (java.lang.NullPointerException e) {
+                    city = "not found";
+                }
+
+                JsonObject data = dataToJson(lon, lat, city);
                 pusher.trigger("client-data", "rsvp", data.toString());
 
                 return STATE.CONTINUE;
