@@ -24,7 +24,7 @@ public class App {
     }
 
     public void getMeetupData () {
-        AsyncHttpClient c = new AsyncHttpClient();
+        AsyncHttpClient c = new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setRequestTimeout(3600000).build());
 
         c.prepareGet("https://stream.meetup.com/2/rsvps").execute(new AsyncCompletionHandler<com.ning.http.client.Response>()
         {
@@ -53,12 +53,24 @@ public class App {
                     city = "New York City";
                 }
 
+                // Once in a while Meetup will return (0,0), which screws up the map's red dot
+                if (lat == "0" && lon == "0") {
+                    lon = "74.0059"; //NYC
+                    lat = "40.7128"; //NYC
+                }
+
                 System.out.println(city);
 
                 JsonObject data = dataToJson(lon, lat, city);
                 pusher.trigger("client-data", "rsvp", data.toString());
 
                 return STATE.CONTINUE;
+            }
+
+            @Override
+            public void onThrowable(Throwable t) {
+                System.out.println("Inside Throwable!!!");
+                System.out.println(t.getMessage());
             }
 
             @Override
