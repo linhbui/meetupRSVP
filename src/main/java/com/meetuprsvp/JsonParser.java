@@ -12,13 +12,11 @@ import java.nio.charset.StandardCharsets;
  * Created by linhbui on 4/22/16.
  */
 class JsonParser {
-    private HttpResponseBodyPart content;
     private String lon;
     private String lat;
     private String city;
 
     public JsonParser(HttpResponseBodyPart content) {
-        this.content = content;
         parse(content);
 
     }
