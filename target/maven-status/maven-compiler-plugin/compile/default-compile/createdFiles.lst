@@ -1,4 +1,5 @@
 com/meetuprsvp/JsonMaker.class
 com/meetuprsvp/App.class
+com/meetuprsvp/Handler.class
 com/meetuprsvp/Secret.class
-com/meetuprsvp/App$1.class
+com/meetuprsvp/JsonParser.class
