@@ -14,15 +14,6 @@ import javax.json.*;
 public class App {
     private Pusher pusher;
 
-    public JsonObject dataToJson(String lon, String lat, String city) {
-        JsonObject data = Json.createObjectBuilder()
-                .add("lon", lon)
-                .add("lat", lat)
-                .add("city", city)
-                .build();
-        return data;
-    }
-
     public void getMeetupData () {
         AsyncHttpClient c = new AsyncHttpClient(new AsyncHttpClientConfig.Builder().setRequestTimeout(3600000).build());
 
@@ -61,7 +52,7 @@ public class App {
 
                 System.out.println(city);
 
-                JsonObject data = dataToJson(lon, lat, city);
+                JsonObject data = JsonMaker.dataToJson(lon, lat, city);
                 pusher.trigger("client-data", "rsvp", data.toString());
 
                 return STATE.CONTINUE;
